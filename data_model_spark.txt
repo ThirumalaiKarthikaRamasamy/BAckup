@@ -1,0 +1,64 @@
+Sales_details
+distirbutor id, car type, color, customer_id, date of sale
+
+Distibuters
+distibuter_id, dist_location,dis_name, manager_id, dist_car_type
+
+
+Managers
+Manager_id, Manager_loc, dist_id's
+
+Region details
+region_id, region_name, managers_id's
+
+
+
+20000000
+
+2000000 * 20
+
+4 * 5
+
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6\bin>jupyter notebook 
+
+REQIN0006352637
+
+
+set JAVA_HOME =C:\Program Files (x86)\Java\jdk1.8.0_131;
+
+set Cassandra_Home=C:\Users\tr809419\Desktop\Spark\cassandra
+
+
+C:\Users\tr809419\Desktop\Spark\cassandra\bin>cassandra.bat
+WARNING! Powershell script execution unavailable.
+   Please use 'powershell Set-ExecutionPolicy Unrestricted'
+   on this user-account to run cassandra with fully featured
+   functionality on this platform.
+Starting with legacy startup options
+Starting Cassandra Server
+Error occurred during initialization of VM
+Could not reserve enough space for 2097152KB object heap
+
+
+
+https://www.edureka.co/blog/apache-cassandra-advantages/
+
+spark-submit --verbose --master spark://localhost:7077 --class spark_sample.spark_sample.SaprkCSVSample spark_sample-0.0.1-SNAPSHOT.jar
+
+spark-submit --class spark_sample.spark_sample.SaprkCSVSample spark_sample-0.0.1-SNAPSHOT.jar
+
+
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6/bin;
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6/python;
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6/python/pyspark/;
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6/python/lib;
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6/python/lib/pyspark.zip;
+C:\Users\tr809419\Desktop\Spark\spark\spark-1.6.1-bin-hadoop2.6/python/lib/py4j-0.9-src.zip;
+
+https://github.com/eBay/Spark/blob/master/examples/src/main/java/org/apache/spark/examples/sql/JavaSparkSQL.java
+
+
+		
+
+
+

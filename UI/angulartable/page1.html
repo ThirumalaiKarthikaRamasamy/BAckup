@@ -1,0 +1,34 @@
+<HTML ng-app="myApp">
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 8.0">
+<TITLE>AngularJS Demo</TITLE>
+<script type="text/javascript" src="C:/Users/tr809419/Desktop/Spark/UI/angulartable/angular/angular.min.js"></script>
+<script type="text/javascript" src="C:/Users/tr809419/Desktop/Spark/UI/angulartable/page1.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<style>
+.listview{width:98%;border-collapse: collapse;border-spacing: 0; text-align:left; margin:10px 10px 0 0; font-size:12px;}
+  .listview th,.listview td{border:1px solid #ccc; padding:0px 5px;font-weight:normal; }
+  .listview th{color:#8c8c8c;font-size:10px;}
+</style>
+</HEAD>
+<BODY ng-controller="myCtrl">
+<table class="table table-striped table-condensed table-hover" style ="border:1px solid;">
+  <thead></thead>
+  <tbody>
+    <tr>
+      <td  width="150">index</td>
+      <td  width="250">name</td>
+      <td>email</td>
+    </tr>
+	<tr ng-repeat = "x in list">
+	  <td  width="150">x.index</td>
+      <td  width="250">x.name</td>
+      <td>x.email</td>
+	</tr>
+   </tbody>
+   </table>
+	
+</BODY>
+</HTML>
