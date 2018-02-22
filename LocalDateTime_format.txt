@@ -1,0 +1,29 @@
+<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+</dependency>
+
+application properties
+spring.jackson.serialization.write-dates-as-timestamps=false
+------------------------
+@Column
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime updatedDate;
+------------------------
+package com.ge.seawolf.planning.template.domain.converter;
+
+import javax.persistence.AttributeConverter;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+public class LocalDateTimeConverter implements AttributeConverter<LocalDateTime, Timestamp> {
+    @Override
+    public Timestamp convertToDatabaseColumn(LocalDateTime attribute) {
+        return attribute != null ? Timestamp.valueOf(attribute) : null;
+    }
+
+    @Override
+    public LocalDateTime convertToEntityAttribute(Timestamp dbData) {
+        return dbData != null ? dbData.toLocalDateTime() : null;
+    }
+}
