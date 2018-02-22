@@ -1,0 +1,138 @@
+private List<EsnData> fetchingAllDataForFirstTime() throws Exception {
+        return  this.pagedResponseEngine.getData(seawolfEventsClient::getEsnDetails).stream().filter(Objects::nonNull).collect(Collectors.toList());
+    }
+	--------------------------------------------
+public ManualPage<EsnData> getEsnDetails(int page) {
+        final String url = alphaUri + internalEsnUrl+page;
+        ResponseEntity<ManualPage<EsnData>> response =
+                internalApiGatewayRestTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<ManualPage<EsnData>>() {});
+        return response.getBody();
+    }
+	
+	------------------------------------------------
+    @ApiOperation(value = "Get All Greenplum ESN details for Documents", notes = "This will fetch ESN Details from Data Lake.", response = ResponseEntity.class)
+    @RequestMapping(value = "/esnDetails", method = RequestMethod.GET, params = {"page"})
+    public ResponseEntity<ManualPage<EsnData>> getEsnDetails(@RequestParam(value = "page") int page) {
+        return new ResponseEntity<>(this.esnDataRowMapper.getPage(page), HttpStatus.OK);
+    }
+	-----------------------------------------
+	
+	 public ManualPage<EsnData> getPage(long page) {
+        Long offset = resultSize * page;
+        Long limit = resultSize;
+        List<EsnData> results = new ArrayList<>();
+        int totalElements = this.getRowCount();
+        String esnDataQuery = QUERY.replace(CONST_EQUIP_TYPE,
+                SINGLE_QUOTE + StringUtils.join(esnEquipmentTypes, "','") + SINGLE_QUOTE);
+        ResultSet rs = null;
+        try (Connection conn = greenplumJdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = conn.prepareStatement(esnDataQuery)) {
+            conn.setReadOnly(true);
+            ps.setFetchSize((int) resultSize);
+            ps.setFetchDirection(ResultSet.FETCH_FORWARD);
+            ps.setLong(1, offset);
+            ps.setLong(2, limit);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(extractResultSetData(rs));
+            }
+            populateRelatedEsn(conn, results);
+        } catch (Exception e) {
+            LOGGER.warn("Exception while getting esn data : ", e);
+            throw new DBException(e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    LOGGER.error("Error while closing resultset.", e);
+                }
+            }
+        }
+
+        return new ManualPage<>(results, totalElements, limit.intValue(), offset.intValue(), page);
+    }
+	
+	---------------
+	 private static final String QUERY = "select"
+            + " equipment_sys_id equipment_sys_id,"
+            + " gib_equip_serial_number gib_esn,"
+            + " train_sys_id train_id," 
+            + " cc_global_name gib_global_customer_name,"
+            + " plant_name gib_site_station_name," 
+            + " site_city gib_city," 
+            + " site_state gib_state,"
+            + " null gib_related_serial_number," 
+            + " equipment_type gib_technology,"
+            + " equipment_model gib_generator_code," 
+            + " equipment_code gib_equipment_code,"
+            + " equipment_class gib_family_code," 
+            + " driven_equipment gib_driven_equipment," 
+            + " null gib_rpm,"
+            + " present_capacity_mw gib_rating," 
+            + " null gib_rating_unit," 
+            + " null gib_cycle_type,"
+            + " contract_performance_manager cpm_sso," 
+            + " customer_service_leader csl_sso,"
+            + " E.last_updated_date last_updated_date "
+            + FROM_CLAUSE
+            + JOIN_CLAUSE_PLANT
+            + JOIN_CLAUSE_BLOCK
+            + JOIN_CLAUSE_TRAIN
+            + WHERE_CLAUSE_1
+            + WHERE_CLAUSE_2
+            + WHERE_CLAUSE_3
+            + " order by equipment_sys_id"
+            + " offset ? limit ?";
+-------------------------------
+
+ @Override
+    public <T> List<T> getData(IClientCaller<T> caller) throws InterruptedException, PageRetryException {
+        List<T> data = new ArrayList<>();
+
+        int currentPage = 42;
+        int numRetries = 0;
+        boolean shouldContinue = true;
+        while(shouldContinue) {
+            // check for Thread interruption
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException("PagedResponseEngine getData() thread interrupted.");
+            }
+
+            try {
+                // process current page
+                ManualPage<T> response = caller.call(currentPage);
+                if(LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Received paged query response : {}", response.toString());
+                }
+                List<T> pageData = response.getContent();
+                if (pageData == null || pageData.isEmpty()) {
+                    LOGGER.error("Received empty response for page [{}]", currentPage);
+                    throw new IllegalStateException(String.format("Received empty response for page [%d]", currentPage));
+                }
+                data.addAll(pageData);
+
+                // prepare to handle next page
+                currentPage++;
+                shouldContinue = !response.isLast();
+            }
+            // if we catch an exception fetching the next page, log it, wait, then retry
+            // if we have exceeded retries, throw a retry exception
+            catch (Exception e) {
+                // any other exception we nest
+                LOGGER.error(String.format("Exception fetching page [%d] of paged response", currentPage), e);
+                if (numRetries >= maxNumRetries) {
+                    LOGGER.error("Maximum number of page tries exceeded. Aborting.");
+                    throw new PageRetryException(currentPage);
+                } else {
+                    // wait 1 second before next retry
+                    numRetries++;
+                    LOGGER.info("Waiting to retry");
+                    Thread.sleep(Duration.of(retryWaitTime, ChronoUnit.valueOf(retryWaitTimeUnits)).toMillis());
+                    continue;
+                }
+            }
+        }
+
+        return data;
+    }
