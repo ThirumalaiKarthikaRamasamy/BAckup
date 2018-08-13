@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Transition Example</title>
+	 <!-- The three files that jQuery Mobile needs to work -->
+    <link rel="stylesheet" href="../jquery.mobile-1.0/jquery.mobile-1.0.css" />
+    <script type="text/javascript"  src="../jquery-1.6.4.js"></script>
+    <script type="text/javascript" src="../jquery.mobile-1.0/jquery.mobile-1.0.js"></script>
+</head>
+<body>
+    <!-- This is the first page -->
+    <section id="firstpage" data-role="page">
+        <header data-role="header">
+        <h1>Page Transition Example</h1>
+        </header>
+        <div data-role="content">
+        <p>This is page 1</p>
+        <a href="#secondpage">Go to second page</a>
+        </div>
+    </section>
+
+    <section id="secondpage" data-role="page">
+        <header data-role="header">
+        <h1>Page Transition Example</h1>
+        </header>
+        <div data-role="content">
+        <p>This is page 2</p>
+        <a href="#firstpage">Go to first page</a>
+        </div>
+    </section>
+</body>
+</html>
